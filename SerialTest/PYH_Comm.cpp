@@ -282,7 +282,7 @@ BOOL CPYH_Comm::Create(HWND hWnd)
 
 }
 
-BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len)
+BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len) //type 추가
 {
 	BOOL	bRet = TRUE;
 	DWORD       ErrorFlags;
@@ -306,10 +306,9 @@ BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len)
 	ClearCommError(m_hComDev, &ErrorFlags, &ComStat);
 
 	return bRet;
-
 }
 
-int CPYH_Comm::Receive(LPSTR inbuf, int len)
+int CPYH_Comm::Receive(LPSTR inbuf, int len) // type추가
 {
 	CSingleLock lockObj((CSyncObject*)m_pEvent, FALSE);
 	// argument value is not valid

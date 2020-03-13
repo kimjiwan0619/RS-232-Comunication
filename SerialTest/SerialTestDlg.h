@@ -42,10 +42,16 @@ public:
 	void InitRichEdit(void);
 	CString m_strCommPort;
 	CString m_strBaudRate;
-	CString m_strParity = _T("None");
-	CString m_strDataBit = _T("16 Bit");
-	CString m_strStopBit = _T("1 Bit");
+	CString m_strParity;
+	CString m_strDataBit;
+	CString m_strStopBit;
+	CString m_strFlowChk;
 	CComboBox m_comboCommport;
 	CComboBox m_comboBaudRate;
+	CComboBox m_comboParity;
+	CComboBox m_comboDataBit;
+	CComboBox m_comboStopBit;
+	CComboBox m_comboFlowChk;
 	CRichEditCtrl m_SData;
+
 };

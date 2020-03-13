@@ -62,6 +62,10 @@ void CSerialTestDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_COMPORT, m_comboCommport);
 	DDX_Control(pDX, IDC_COMBO_BAUDRATE, m_comboBaudRate);
 	DDX_Control(pDX, IDC_RICHEDIT_SEND, m_SData);
+	DDX_Control(pDX, IDC_COMBO_PARITY, m_comboParity);
+	DDX_Control(pDX, IDC_COMBO_DATABIT, m_comboDataBit);
+	DDX_Control(pDX, IDC_COMBO_STOPBIT, m_comboStopBit);
+	DDX_Control(pDX, IDC_COMBO_FLOWCHK, m_comboFlowChk);
 }
 
 BEGIN_MESSAGE_MAP(CSerialTestDlg, CDialog)
@@ -132,6 +136,19 @@ BOOL CSerialTestDlg::OnInitDialog()
 	m_comboBaudRate.AddString(_T("PCI_57600"));
 	m_comboBaudRate.AddString(_T("PCI_500k"));
 	m_comboBaudRate.SetCurSel(0);
+	m_comboParity.AddString(_T("None"));
+	m_comboParity.AddString(_T("Odd"));
+	m_comboParity.AddString(_T("Even"));
+	m_comboParity.SetCurSel(0);
+	m_comboDataBit.AddString(_T("8 Bit"));
+	m_comboDataBit.AddString(_T("7 Bit"));
+	m_comboDataBit.SetCurSel(0);
+	m_comboStopBit.AddString(_T("1 Bit"));
+	m_comboStopBit.AddString(_T("1.5 Bit"));
+	m_comboStopBit.AddString(_T("2 Bit"));
+	m_comboStopBit.SetCurSel(0);
+	m_comboFlowChk.AddString(_T("None"));
+	m_comboFlowChk.SetCurSel(0);
 
 	return TRUE;  // 컨트롤에 대한 포커스를 설정하지 않을 경우 TRUE를 반환합니다.
 }
@@ -187,10 +204,15 @@ HCURSOR CSerialTestDlg::OnQueryDragIcon()
 
 void CSerialTestDlg::OnBnClickedButtonConnect()
 {
-	this->m_comboCommport.GetLBText(this->m_comboCommport.GetCurSel(), m_strCommPort);
-	this->m_comboBaudRate.GetLBText(this->m_comboBaudRate.GetCurSel(), m_strBaudRate);
+	m_comboCommport.GetLBText(m_comboCommport.GetCurSel(), m_strCommPort);
+	m_comboBaudRate.GetLBText(m_comboBaudRate.GetCurSel(), m_strBaudRate);
+	m_comboParity.GetLBText(m_comboParity.GetCurSel(), m_strParity);
+	m_comboDataBit.GetLBText(m_comboDataBit.GetCurSel(), m_strDataBit);
+	m_comboStopBit.GetLBText(m_comboStopBit.GetCurSel(), m_strStopBit);
+
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_Comm = new CPYH_Comm(_T("\\\\.\\") + m_strCommPort, m_strBaudRate, _T("None"), _T("8 Bit"), _T("1 Bit"));	// initial Comm port
+	// initial Comm port
+	m_Comm = new CPYH_Comm(_T("\\\\.\\") + m_strCommPort, m_strBaudRate, m_strParity, m_strDataBit, m_strStopBit);	
 	if (m_Comm->Create(GetSafeHwnd()) != 0)	//통신포트를 열고 윈도우의 핸들을 넘긴다.
 	{
 		AfxMessageBox(_T("opened"));
@@ -205,7 +227,7 @@ void CSerialTestDlg::OnBnClickedButtonSend()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString str;
 	GetDlgItem(IDC_EDIT1)->GetWindowText(str);
-	str += "\r\n";
+	str += _T("\r\n");
 	m_Comm->Send(str, str.GetLength());
 }
 
@@ -236,18 +258,15 @@ LRESULT CSerialTestDlg::OnReceive(WPARAM length, LPARAM lpara)
 	CString str, temp;
 	char data[20000] ;
 	ZeroMemory(data, sizeof(char) * 20000);
-	int nReceived = 0;
-	static int nRecvCount = 0;
 	if (m_Comm)
 	{
-		nReceived = m_Comm->Receive(data, length);
-		
+		m_Comm->Receive(data, length);	
 		for (int i = 0; i<(int)length; i++)
 		{
 			temp = data[i];
 			str += temp;
 		}
-		m_RData.ReplaceSel(str + _T("\n"));
+		m_RData.ReplaceSel(str + _T("\r\n"));
 	}
 	return 0;
 }

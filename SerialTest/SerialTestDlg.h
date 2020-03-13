@@ -5,7 +5,7 @@
 #include "afxcmn.h"
 #include "PYH_Comm.h"
 #include "afxwin.h"
-
+#include "SettingsDlg.h"
 
 // CSerialTestDlg 대화 상자
 class CSerialTestDlg : public CDialog
@@ -35,6 +35,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
+	SettingsDlg dlg;
 	CString m_SendData;
 	CRichEditCtrl m_RData;
 	afx_msg void OnBnClickedButtonConnect();
@@ -43,15 +44,11 @@ public:
 	CString m_strCommPort;
 	CString m_strBaudRate;
 	CString m_strParity;
+	CString m_strType;
 	CString m_strDataBit;
 	CString m_strStopBit;
 	CString m_strFlowChk;
-	CComboBox m_comboCommport;
-	CComboBox m_comboBaudRate;
-	CComboBox m_comboParity;
-	CComboBox m_comboDataBit;
-	CComboBox m_comboStopBit;
-	CComboBox m_comboFlowChk;
-	CRichEditCtrl m_SData;
 
+	afx_msg void OnSerialPort();
+	afx_msg void OnFilesend();
 };

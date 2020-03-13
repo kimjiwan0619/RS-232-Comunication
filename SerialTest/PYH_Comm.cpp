@@ -16,11 +16,12 @@ static char THIS_FILE[] = __FILE__;
 
 IMPLEMENT_DYNCREATE(CPYH_Comm, CCmdTarget)
 
-CPYH_Comm::CPYH_Comm(CString port, CString baudrate, CString parity, CString databit, CString stopbit)
+CPYH_Comm::CPYH_Comm(CString port, CString baudrate, CString parity, CString type, CString databit, CString stopbit)
 {
 	m_sComPort = port;
 	m_sBaudRate = baudrate;
 	m_sParity = parity;
+	m_sType = type;
 	m_sDataBit = databit;
 	m_sStopBit = stopbit;
 	m_bFlowChk = 1;
@@ -228,8 +229,6 @@ UINT CommThread(LPVOID lpData)
 			Comm->m_pEvent->SetEvent();
 			LPARAM temp = (LPARAM)Comm;
 			SendMessage(Comm->m_hWnd, WM_MYRECEIVE, Comm->m_nLength, temp);
-
-
 		}
 	}
 	PurgeComm(Comm->m_hComDev, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
@@ -282,7 +281,7 @@ BOOL CPYH_Comm::Create(HWND hWnd)
 
 }
 
-BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len) //type 추가
+BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len, CString type) //type 추가
 {
 	BOOL	bRet = TRUE;
 	DWORD       ErrorFlags;

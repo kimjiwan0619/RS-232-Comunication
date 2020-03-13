@@ -59,13 +59,6 @@ void CSerialTestDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_EDIT1, m_SendData);
 	DDX_Control(pDX, IDC_RICHEDIT_RECEIVE, m_RData);
-	DDX_Control(pDX, IDC_COMBO_COMPORT, m_comboCommport);
-	DDX_Control(pDX, IDC_COMBO_BAUDRATE, m_comboBaudRate);
-	DDX_Control(pDX, IDC_RICHEDIT_SEND, m_SData);
-	DDX_Control(pDX, IDC_COMBO_PARITY, m_comboParity);
-	DDX_Control(pDX, IDC_COMBO_DATABIT, m_comboDataBit);
-	DDX_Control(pDX, IDC_COMBO_STOPBIT, m_comboStopBit);
-	DDX_Control(pDX, IDC_COMBO_FLOWCHK, m_comboFlowChk);
 }
 
 BEGIN_MESSAGE_MAP(CSerialTestDlg, CDialog)
@@ -77,6 +70,8 @@ BEGIN_MESSAGE_MAP(CSerialTestDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, OnBnClickedButtonSend)
 	ON_MESSAGE(WM_MYRECEIVE, OnReceive)
 	ON_MESSAGE(WM_MYCLOSE, OnThreadClosed)
+	ON_COMMAND(ID_SerialPort, &CSerialTestDlg::OnSerialPort)
+	ON_COMMAND(ID_FileSend, &CSerialTestDlg::OnFilesend)
 END_MESSAGE_MAP()
 
 
@@ -110,46 +105,6 @@ BOOL CSerialTestDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 									// TODO: 여기에 추가 초기화 작업을 추가합니다.
-	//GetDlgItem(IDC_BUTTON1)->EnableWindow(true);
-	//GetDlgItem(IDC_BUTTON2)->EnableWindow(false);
-	m_comboCommport.AddString(_T("COM3"));
-	m_comboCommport.AddString(_T("COM4"));
-	m_comboCommport.SetCurSel(0);
-	m_comboBaudRate.AddString(_T("300"));
-	m_comboBaudRate.AddString(_T("600"));
-	m_comboBaudRate.AddString(_T("1200"));
-	m_comboBaudRate.AddString(_T("2400"));
-	m_comboBaudRate.AddString(_T("4800"));
-	m_comboBaudRate.AddString(_T("9600"));
-	m_comboBaudRate.AddString(_T("14400"));
-	m_comboBaudRate.AddString(_T("19200"));
-	m_comboBaudRate.AddString(_T("28800"));
-	m_comboBaudRate.AddString(_T("33600"));
-	m_comboBaudRate.AddString(_T("38400"));
-	m_comboBaudRate.AddString(_T("56000"));
-	m_comboBaudRate.AddString(_T("115200"));
-	m_comboBaudRate.AddString(_T("128000"));
-	m_comboBaudRate.AddString(_T("256000"));
-	m_comboBaudRate.AddString(_T("PCI_9600"));
-	m_comboBaudRate.AddString(_T("PCI_19200"));
-	m_comboBaudRate.AddString(_T("PCI_38400"));
-	m_comboBaudRate.AddString(_T("PCI_57600"));
-	m_comboBaudRate.AddString(_T("PCI_500k"));
-	m_comboBaudRate.SetCurSel(0);
-	m_comboParity.AddString(_T("None"));
-	m_comboParity.AddString(_T("Odd"));
-	m_comboParity.AddString(_T("Even"));
-	m_comboParity.SetCurSel(0);
-	m_comboDataBit.AddString(_T("8 Bit"));
-	m_comboDataBit.AddString(_T("7 Bit"));
-	m_comboDataBit.SetCurSel(0);
-	m_comboStopBit.AddString(_T("1 Bit"));
-	m_comboStopBit.AddString(_T("1.5 Bit"));
-	m_comboStopBit.AddString(_T("2 Bit"));
-	m_comboStopBit.SetCurSel(0);
-	m_comboFlowChk.AddString(_T("None"));
-	m_comboFlowChk.SetCurSel(0);
-
 	return TRUE;  // 컨트롤에 대한 포커스를 설정하지 않을 경우 TRUE를 반환합니다.
 }
 
@@ -204,15 +159,10 @@ HCURSOR CSerialTestDlg::OnQueryDragIcon()
 
 void CSerialTestDlg::OnBnClickedButtonConnect()
 {
-	m_comboCommport.GetLBText(m_comboCommport.GetCurSel(), m_strCommPort);
-	m_comboBaudRate.GetLBText(m_comboBaudRate.GetCurSel(), m_strBaudRate);
-	m_comboParity.GetLBText(m_comboParity.GetCurSel(), m_strParity);
-	m_comboDataBit.GetLBText(m_comboDataBit.GetCurSel(), m_strDataBit);
-	m_comboStopBit.GetLBText(m_comboStopBit.GetCurSel(), m_strStopBit);
-
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	// initial Comm port
-	m_Comm = new CPYH_Comm(_T("\\\\.\\") + m_strCommPort, m_strBaudRate, m_strParity, m_strDataBit, m_strStopBit);	
+	AfxMessageBox(m_strCommPort);
+	m_Comm = new CPYH_Comm(_T("\\\\.\\") + m_strCommPort, m_strBaudRate, m_strParity, m_strType , m_strDataBit, m_strStopBit);
 	if (m_Comm->Create(GetSafeHwnd()) != 0)	//통신포트를 열고 윈도우의 핸들을 넘긴다.
 	{
 		AfxMessageBox(_T("opened"));
@@ -225,10 +175,10 @@ void CSerialTestDlg::OnBnClickedButtonConnect()
 void CSerialTestDlg::OnBnClickedButtonSend()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString str;
-	GetDlgItem(IDC_EDIT1)->GetWindowText(str);
-	str += _T("\r\n");
-	m_Comm->Send(str, str.GetLength());
+	CString str, type;
+	GetDlgItem(IDC_EDIT2)->GetWindowText(str);
+	//str += _T("\r\n");
+	m_Comm->Send(str, str.GetLength(), type);
 }
 
 LRESULT CSerialTestDlg::OnThreadClosed(WPARAM length, LPARAM lpara)
@@ -269,4 +219,36 @@ LRESULT CSerialTestDlg::OnReceive(WPARAM length, LPARAM lpara)
 		m_RData.ReplaceSel(str + _T("\r\n"));
 	}
 	return 0;
+}
+
+
+void CSerialTestDlg::OnSerialPort()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	dlg.DoModal();
+	m_strCommPort = dlg.m_strCommPort;
+	m_strBaudRate = dlg.m_strBaudRate;
+	m_strParity = dlg.m_strParity;
+	m_strType = dlg.m_strType;
+	m_strDataBit = dlg.m_strDataBit;
+	m_strStopBit = dlg.m_strStopBit;
+	m_strFlowChk = dlg.m_strFlowChk;
+	//dlg.DestroyWindow();
+}
+
+
+void CSerialTestDlg::OnFilesend()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+
+	CString strPathName;
+	char szFilter[] = "All Files(*.*)|*.*||";
+	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, szFilter);
+	if (IDOK == dlg.DoModal())
+		strPathName = dlg.GetPathName();
+
+	// 경로를 가져와 사용할 경우, Edit Control 에 값 저장
+	CString str;
+	str.Format(_T("%s"), strPathName);
+	SetDlgItemText(IDC_EDIT2, str);
 }

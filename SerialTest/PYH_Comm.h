@@ -33,6 +33,7 @@ public:
 	HWND	m_hWnd;
 
 	BOOL	m_bIsOpenned;
+	CString m_sType;
 	CString	m_sComPort;
 	CString	m_sBaudRate;
 	CString	m_sParity;
@@ -49,12 +50,12 @@ public:
 public:
 	void Clear();
 	int Receive(LPSTR inbuf, int len);
-	BOOL Send(LPCTSTR outbuf, int len);
+	BOOL Send(LPCTSTR outbuf, int len, CString type);
 	BOOL Create(HWND hWnd);
 	void HandleClose();
 	void Close();
 	void ResetSerial();
-	CPYH_Comm(CString port, CString baudrate, CString parity, CString databit, CString stopbit);
+	CPYH_Comm(CString port, CString baudrate, CString parity, CString type, CString databit, CString stopbit);
 
 	// Overrides
 	// ClassWizard generated virtual function overrides

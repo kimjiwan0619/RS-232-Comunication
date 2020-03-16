@@ -50,13 +50,13 @@ public:
 public:
 	void Clear();
 	int Receive(LPSTR inbuf, int len);
-	BOOL Send(LPCTSTR outbuf, int len, CString type);
+	BOOL Send(LPCTSTR outbuf, int len);
 	BOOL Create(HWND hWnd);
 	void HandleClose();
 	void Close();
 	void ResetSerial();
 	CPYH_Comm(CString port, CString baudrate, CString parity, CString type, CString databit, CString stopbit);
-
+	BOOL Check(LPCTSTR outbuf, int len);
 	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CPYH_Comm)

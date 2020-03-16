@@ -69,7 +69,6 @@ BEGIN_MESSAGE_MAP(CSerialTestDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_CONNECT, OnBnClickedButtonConnect)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, OnBnClickedButtonSend)
 	ON_MESSAGE(WM_MYRECEIVE, OnReceive)
-	ON_MESSAGE(WM_MYCLOSE, OnThreadClosed)
 	ON_COMMAND(ID_SerialPort, &CSerialTestDlg::OnSerialPort)
 	ON_COMMAND(ID_FileSend, &CSerialTestDlg::OnFilesend)
 END_MESSAGE_MAP()
@@ -175,19 +174,28 @@ void CSerialTestDlg::OnBnClickedButtonConnect()
 void CSerialTestDlg::OnBnClickedButtonSend()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString str, type;
-	GetDlgItem(IDC_EDIT2)->GetWindowText(str);
-	//str += _T("\r\n");
-	m_Comm->Send(str, str.GetLength(), type);
-}
+	int type = 1;
+	GetDlgItem(IDC_EDIT2)->GetWindowText(m_strFilePath);
+	byte * pBuff = NULL;
+	CFile file;
 
-LRESULT CSerialTestDlg::OnThreadClosed(WPARAM length, LPARAM lpara)
-{
-	//overlapped i/o 핸들을 닫는다.
-	((CPYH_Comm*)lpara)->HandleClose();
-	delete ((CPYH_Comm*)lpara);
-
-	return 0;
+	CString strFilename = _T("C:\\test\\a.jpg");
+	if (file.Open(strFilename, CFile::modeRead ) )
+	{
+		pBuff = new byte[file.GetLength() + 24];
+		int sop = 0x01;
+		int pos = 0;
+		int len = file.GetLength();
+		int eop = 0x02;
+		memcpy(pBuff, &sop, 4);
+		memcpy(pBuff + 4, &type, 4);
+		memcpy(pBuff + 8, &len, 4);
+		file.Read(pBuff + 12, len);
+		memcpy(pBuff + len + 12, &eop, 4);
+	}
+	m_Comm->Send((LPCTSTR)pBuff, file.GetLength() + 24);
+	delete[] pBuff;
+	file.Close();
 }
 
 void CSerialTestDlg::InitRichEdit(void)
@@ -205,19 +213,36 @@ void CSerialTestDlg::InitRichEdit(void)
 
 LRESULT CSerialTestDlg::OnReceive(WPARAM length, LPARAM lpara)
 {
+
 	CString str, temp;
-	char data[20000] ;
-	ZeroMemory(data, sizeof(char) * 20000);
+	char *data = new char[length];
+	ZeroMemory(data, sizeof(char) * length);
+	//if (m_Comm)
+	//{
+	//	m_Comm->Receive(data, length);	
+	//	for (int i = 0; i<(int)length; i++)
+	//	{
+	//		temp = data[i];
+	//		str += temp;
+	//	}
+	//	m_RData.ReplaceSel(str + _T("\r\n"));
+	//}
 	if (m_Comm)
 	{
-		m_Comm->Receive(data, length);	
-		for (int i = 0; i<(int)length; i++)
+		m_Comm->Receive(data, length);
+		if (data[2] == 1)
 		{
-			temp = data[i];
-			str += temp;
+			char *data2 = new char[length - 6];
+			for (int i = 0; i < length-6; i++)
+				data2[i] = data[i + 4];
+			CFile file;
+			file.Open("test.jpg", CFile::modeWrite | CFile::typeBinary);
+			file.Write(data, length);
+			file.Close();
+			delete[] data2;
 		}
-		m_RData.ReplaceSel(str + _T("\r\n"));
 	}
+	delete[] data;
 	return 0;
 }
 

@@ -12,7 +12,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// CPYH_Comm
+// CPYH_Commm
 
 IMPLEMENT_DYNCREATE(CPYH_Comm, CCmdTarget)
 
@@ -29,6 +29,15 @@ CPYH_Comm::CPYH_Comm(CString port, CString baudrate, CString parity, CString typ
 	m_nLength = 0;
 	memset(m_sInBuf, 0, MAXBUF * 2);
 	m_pEvent = new CEvent(FALSE, TRUE);
+}
+
+BOOL CPYH_Comm::Check(LPCTSTR outbuf, int len)
+{
+	int sop, eop, type, length;
+	if (memcpy(&sop, outbuf, 4) == 0x01 && memcpy(&eop, outbuf, 4) == 0x02)
+		return TRUE;
+	else
+		return FALSE;
 }
 
 CPYH_Comm::~CPYH_Comm()
@@ -281,8 +290,9 @@ BOOL CPYH_Comm::Create(HWND hWnd)
 
 }
 
-BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len, CString type) //type 추가
+BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len)
 {
+	int lasd = len;
 	BOOL	bRet = TRUE;
 	DWORD       ErrorFlags;
 	COMSTAT     ComStat;
@@ -291,6 +301,7 @@ BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len, CString type) //type 추가
 	DWORD       BytesSent = 0;
 
 	ClearCommError(m_hComDev, &ErrorFlags, &ComStat);
+
 	if (!WriteFile(m_hComDev, outbuf, len, &BytesWritten, &m_OLW)) {
 		if (GetLastError() == ERROR_IO_PENDING) {
 			if (WaitForSingleObject(m_OLW.hEvent, 1000) != WAIT_OBJECT_0)
@@ -305,38 +316,43 @@ BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len, CString type) //type 추가
 	ClearCommError(m_hComDev, &ErrorFlags, &ComStat);
 
 	return bRet;
+	
 }
 
 int CPYH_Comm::Receive(LPSTR inbuf, int len) // type추가
 {
-	CSingleLock lockObj((CSyncObject*)m_pEvent, FALSE);
-	// argument value is not valid
-	if (len == 0)
-		return -1;
-	else if (len > MAXBUF)
-		return -1;
+	if (Check(inbuf, len))
+	{
+		CSingleLock lockObj((CSyncObject*)m_pEvent, FALSE);
+		// argument value is not valid
+		if (len == 0)
+			return -1;
+		else if (len > MAXBUF)
+			return -1;
 
-	if (m_nLength == 0) {
-		inbuf[0] = '\0';
-		return 0;
+		if (m_nLength == 0) {
+			inbuf[0] = '\0';
+			return 0;
+		}
+		else if (m_nLength <= len) {
+			lockObj.Lock();
+			memcpy(inbuf, m_sInBuf, m_nLength);
+			memset(m_sInBuf, 0, MAXBUF * 2);
+			int tmp = m_nLength;
+			m_nLength = 0;
+			lockObj.Unlock();
+			return tmp;
+		}
+		else {
+			lockObj.Lock();
+			memcpy(inbuf, m_sInBuf, len);
+			memmove(m_sInBuf, m_sInBuf + len, MAXBUF * 2 - len);
+			m_nLength -= len;
+			lockObj.Unlock();
+			return len;
+		}
 	}
-	else if (m_nLength <= len) {
-		lockObj.Lock();
-		memcpy(inbuf, m_sInBuf, m_nLength);
-		memset(m_sInBuf, 0, MAXBUF * 2);
-		int tmp = m_nLength;
-		m_nLength = 0;
-		lockObj.Unlock();
-		return tmp;
-	}
-	else {
-		lockObj.Lock();
-		memcpy(inbuf, m_sInBuf, len);
-		memmove(m_sInBuf, m_sInBuf + len, MAXBUF * 2 - len);
-		m_nLength -= len;
-		lockObj.Unlock();
-		return len;
-	}
+	return -1;
 }
 
 void CPYH_Comm::Clear()

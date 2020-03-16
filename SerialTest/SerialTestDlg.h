@@ -13,7 +13,6 @@ class CSerialTestDlg : public CDialog
 	// 积己
 public:
 	CPYH_Comm* m_Comm;
-	LRESULT	OnThreadClosed(WPARAM length, LPARAM lpara);
 	LRESULT	OnReceive(WPARAM length, LPARAM lpara);
 	CSerialTestDlg(CWnd* pParent = NULL);	// 钎霖 积己磊
 
@@ -48,6 +47,7 @@ public:
 	CString m_strDataBit;
 	CString m_strStopBit;
 	CString m_strFlowChk;
+	CString m_strFilePath;
 
 	afx_msg void OnSerialPort();
 	afx_msg void OnFilesend();

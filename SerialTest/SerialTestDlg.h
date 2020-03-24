@@ -72,6 +72,8 @@ public:
 	CString strFile;
 	CString m_strFileName;
 	CString Rename;
+	CString m_strText = "";
+	CString m_strRcvFileName;
 	afx_msg void OnSerialPort();
 	afx_msg void OnFilesend();
 	afx_msg void OnBnClickedButtonSendtext();
@@ -83,7 +85,7 @@ public:
 	UINT32 nDataLength = 0;
 	UINT m_nType = 0;
 	UINT32 nTemp = 0;
-	CString m_strText = "";
+	
 	char* m_FileName = NULL;
 	
 	BOOL bChk = FALSE;

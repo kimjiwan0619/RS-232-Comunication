@@ -1,0 +1,47 @@
+﻿  stdafx.cpp
+c:\program files (x86)\microsoft visual studio 14.0\vc\atlmfc\include\afx.h(38): warning C4996: 'MBCS_Support_Deprecated_In_MFC': MBCS support in MFC is deprecated and may be removed in a future version of MFC.
+  c:\program files (x86)\microsoft visual studio 14.0\vc\atlmfc\include\afx.h(33): note: 'MBCS_Support_Deprecated_In_MFC' 선언을 참조하십시오.
+c:\users\user\desktop\rs-232-comunication\serialtest\stdafx.h(51): warning C4005: 'TRACE': 매크로 재정의
+  c:\program files (x86)\microsoft visual studio 14.0\vc\atlmfc\include\afx.h(348): note: 'TRACE'의 이전 정의를 참조하십시오.
+  SettingsDlg.cpp
+  SerialTestDlg.cpp
+c:\users\user\desktop\rs-232-comunication\serialtest\serialtestdlg.h(16): warning C4005: 'TEXT': 매크로 재정의
+  c:\program files (x86)\windows kits\8.1\include\um\winnt.h(536): note: 'TEXT'의 이전 정의를 참조하십시오.
+c:\users\user\desktop\rs-232-comunication\serialtest\serialtestdlg.cpp(221): warning C4244: '인수': 'WPARAM'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\serialtestdlg.cpp(230): warning C4244: '+=': 'WPARAM'에서 'UINT32'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\serialtestdlg.cpp(317): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\serialtestdlg.cpp(369): warning C4244: '인수': 'WPARAM'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\serialtestdlg.cpp(377): warning C4244: '+=': 'WPARAM'에서 'UINT32'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\serialtestdlg.cpp(400): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\serialtestdlg.cpp(542): warning C4244: '초기화 중': 'ULONGLONG'에서 'UINT32'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\serialtestdlg.cpp(551): warning C4244: '초기화 중': 'ULONGLONG'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  SerialTest.cpp
+c:\users\user\desktop\rs-232-comunication\serialtest\serialtestdlg.h(16): warning C4005: 'TEXT': 매크로 재정의
+  c:\program files (x86)\windows kits\8.1\include\um\winnt.h(536): note: 'TEXT'의 이전 정의를 참조하십시오.
+  PYH_Comm.cpp
+  MD5Checksum.cpp
+  CIni.cpp
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(107): warning C4267: '=': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(112): warning C4267: '=': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(136): warning C4267: '초기화 중': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(205): warning C4267: '초기화 중': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(205): warning C4267: '초기화 중': 'size_t'에서 'const DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(244): warning C4244: '=': 'INT_PTR'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(246): warning C4244: '=': 'INT_PTR'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(383): warning C4267: '초기화 중': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(799): warning C4267: 'return': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(803): warning C4267: '초기화 중': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(803): warning C4267: '초기화 중': 'size_t'에서 'const DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(816): warning C4267: '초기화 중': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(816): warning C4267: '초기화 중': 'size_t'에서 'const DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(838): warning C4267: '초기화 중': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(838): warning C4267: '초기화 중': 'size_t'에서 'const DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(862): warning C4267: '초기화 중': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(870): warning C4267: '=': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(917): warning C4267: '초기화 중': 'size_t'에서 'DWORD'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(1046): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(1084): warning C4311: '형식 캐스팅': 'LPCTSTR'에서 'DWORD'(으)로 포인터가 잘립니다.
+c:\users\user\desktop\rs-232-comunication\serialtest\cini.cpp(1084): warning C4302: '형식 캐스팅': 'LPCTSTR'에서 'DWORD'(으)로 잘립니다.
+  코드를 생성하고 있습니다...
+  SerialTest.vcxproj -> C:\Users\user\Desktop\RS-232-Comunication\x64\Debug\SerialTest.exe
+  SerialTest.vcxproj -> C:\Users\user\Desktop\RS-232-Comunication\x64\Debug\SerialTest.pdb (Partial PDB)

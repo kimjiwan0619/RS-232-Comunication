@@ -414,11 +414,12 @@ LRESULT CSerialTestDlg::OnReceive(WPARAM length, LPARAM lpara)
 					if (dlg.DoModal() == IDOK)
 					{
 						strPathName = dlg.GetPathName();
+						m_strRcvFileName = strPathName;
 						if (m_fileSave.Open(strPathName, CFile::modeCreate | CFile::modeReadWrite))
 						{
 							TRACE("fileOpened\r\n");
 							UpdateData(TRUE);
-							m_fileSave.Write(m_pData, nDataLength - 4);
+							m_fileSave.Write(m_pData, nDataLength);
 							m_fileSave.Close();
 							AfxMessageBox(_T("File Transfer Done"));
 							m_Pgrs_File.SetPos(0);
@@ -587,10 +588,12 @@ void CSerialTestDlg::MD5Send()
 	CString checkSum;
 	byte * pBuff = NULL;
 
-	srcfile.Open(m_strFilePath, CFile::modeRead);
-	checkSum = CMD5Checksum::GetMD5(srcfile);
-	srcfile.Close();
-
+	if (srcfile.Open(m_strFilePath, CFile::modeRead))
+	{
+		checkSum = CMD5Checksum::GetMD5(srcfile);
+		srcfile.Close();
+	}
+	
 	UINT32 sop = 0x12345678;
 	UINT32 type = MD5SEND;
 	UINT32 len = checkSum.GetLength();
@@ -611,14 +614,17 @@ void CSerialTestDlg::MD5RECEIVED(CString checkSum)
 	CFile mdfile;
 	CString downData;
 
-	mdfile.Open(Rename, CFile::modeRead);
-	downData = CMD5Checksum::GetMD5(mdfile);
-	mdfile.Close();
+	if (mdfile.Open(m_strRcvFileName, CFile::modeRead))
+	{
+		downData = CMD5Checksum::GetMD5(mdfile);
+		mdfile.Close();
+	}
 
 	if (checkSum.Compare(downData) == 0)
 		AfxMessageBox(_T("5MD OK"));
 	else
 		AfxMessageBox(_T("5MD Fail"));
+	m_strRcvFileName = "";
 }
 
 void CSerialTestDlg::FileReceived()

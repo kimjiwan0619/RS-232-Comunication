@@ -42,3 +42,16 @@
 
 
 
+#ifdef _DEBUG
+
+bool _trace(TCHAR *format, ...);
+
+bool _trace(CString strFormat, ...);
+
+#define TRACE _trace
+
+#else
+
+#define TRACE false && _trace
+
+#endif

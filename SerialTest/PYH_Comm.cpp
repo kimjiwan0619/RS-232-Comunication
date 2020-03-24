@@ -12,16 +12,15 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// CPYH_Commm
+// CPYH_Comm
 
 IMPLEMENT_DYNCREATE(CPYH_Comm, CCmdTarget)
 
-CPYH_Comm::CPYH_Comm(CString port, CString baudrate, CString parity, CString type, CString databit, CString stopbit)
+CPYH_Comm::CPYH_Comm(CString port, CString baudrate, CString parity, CString databit, CString stopbit, CWnd *pParent)
 {
 	m_sComPort = port;
 	m_sBaudRate = baudrate;
 	m_sParity = parity;
-	m_sType = type;
 	m_sDataBit = databit;
 	m_sStopBit = stopbit;
 	m_bFlowChk = 1;
@@ -29,15 +28,7 @@ CPYH_Comm::CPYH_Comm(CString port, CString baudrate, CString parity, CString typ
 	m_nLength = 0;
 	memset(m_sInBuf, 0, MAXBUF * 2);
 	m_pEvent = new CEvent(FALSE, TRUE);
-}
-
-BOOL CPYH_Comm::Check(LPCTSTR outbuf, int len)
-{
-	int sop, eop, type, length;
-	if (memcpy(&sop, outbuf, 4) == 0x01 && memcpy(&eop, outbuf, 4) == 0x02)
-		return TRUE;
-	else
-		return FALSE;
+	m_pParent = pParent;
 }
 
 CPYH_Comm::~CPYH_Comm()
@@ -65,7 +56,7 @@ void CPYH_Comm::ResetSerial()
 
 	if (!m_bIsOpenned)
 		return;
-	// error 초기화
+
 	ClearCommError(m_hComDev, &DErr, NULL);
 	SetupComm(m_hComDev, InBufSize, OutBufSize);
 	PurgeComm(m_hComDev, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
@@ -152,7 +143,7 @@ void CPYH_Comm::ResetSerial()
 		dcb.StopBits = ONE5STOPBITS;
 	else if (m_sStopBit == "2 Bit")
 		dcb.StopBits = TWOSTOPBITS;
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	dcb.fRtsControl = RTS_CONTROL_ENABLE;
 	dcb.fDtrControl = DTR_CONTROL_ENABLE;
 	dcb.fOutxDsrFlow = FALSE;
@@ -198,8 +189,9 @@ UINT CommThread(LPVOID lpData)
 	int	insize = 0;
 
 	CPYH_Comm* Comm = (CPYH_Comm*)lpData;
-
+	int cnt = 0;
 	while (Comm->m_bIsOpenned) {
+		
 		EvtMask = 0;
 		Length = 0;
 		insize = 0;
@@ -238,6 +230,7 @@ UINT CommThread(LPVOID lpData)
 			Comm->m_pEvent->SetEvent();
 			LPARAM temp = (LPARAM)Comm;
 			SendMessage(Comm->m_hWnd, WM_MYRECEIVE, Comm->m_nLength, temp);
+			cnt++;
 		}
 	}
 	PurgeComm(Comm->m_hComDev, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
@@ -273,7 +266,7 @@ BOOL CPYH_Comm::Create(HWND hWnd)
 	m_OLW.OffsetHigh = 0;
 	m_OLR.Offset = 0;
 	m_OLR.OffsetHigh = 0;
-
+	
 	m_OLR.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	if (m_OLR.hEvent == NULL) {
 		CloseHandle(m_OLR.hEvent);
@@ -287,12 +280,10 @@ BOOL CPYH_Comm::Create(HWND hWnd)
 	AfxBeginThread(CommThread, (LPVOID)this);
 	EscapeCommFunction(m_hComDev, SETDTR);
 	return TRUE;
-
 }
 
 BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len)
 {
-	int lasd = len;
 	BOOL	bRet = TRUE;
 	DWORD       ErrorFlags;
 	COMSTAT     ComStat;
@@ -301,9 +292,9 @@ BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len)
 	DWORD       BytesSent = 0;
 
 	ClearCommError(m_hComDev, &ErrorFlags, &ComStat);
-
 	if (!WriteFile(m_hComDev, outbuf, len, &BytesWritten, &m_OLW)) {
 		if (GetLastError() == ERROR_IO_PENDING) {
+
 			if (WaitForSingleObject(m_OLW.hEvent, 1000) != WAIT_OBJECT_0)
 				bRet = FALSE;
 			else
@@ -312,47 +303,41 @@ BOOL CPYH_Comm::Send(LPCTSTR outbuf, int len)
 		else /* I/O error */
 			bRet = FALSE; /* ignore error */
 	}
-
 	ClearCommError(m_hComDev, &ErrorFlags, &ComStat);
-
 	return bRet;
-	
+	TRACE(_T("SendOver\r\n"));
 }
 
-int CPYH_Comm::Receive(LPSTR inbuf, int len) // type추가
+int CPYH_Comm::Receive(LPSTR inbuf, int len)
 {
-	if (Check(inbuf, len))
-	{
-		CSingleLock lockObj((CSyncObject*)m_pEvent, FALSE);
-		// argument value is not valid
-		if (len == 0)
-			return -1;
-		else if (len > MAXBUF)
-			return -1;
+	CSingleLock lockObj((CSyncObject*)m_pEvent, FALSE);
+	// argument value is not valid
+	if (len == 0)
+		return -1;
+	else if (len > MAXBUF)
+		return -1;
 
-		if (m_nLength == 0) {
-			inbuf[0] = '\0';
-			return 0;
-		}
-		else if (m_nLength <= len) {
-			lockObj.Lock();
-			memcpy(inbuf, m_sInBuf, m_nLength);
-			memset(m_sInBuf, 0, MAXBUF * 2);
-			int tmp = m_nLength;
-			m_nLength = 0;
-			lockObj.Unlock();
-			return tmp;
-		}
-		else {
-			lockObj.Lock();
-			memcpy(inbuf, m_sInBuf, len);
-			memmove(m_sInBuf, m_sInBuf + len, MAXBUF * 2 - len);
-			m_nLength -= len;
-			lockObj.Unlock();
-			return len;
-		}
+	if (m_nLength == 0) {
+		inbuf[0] = '\0';
+		return 0;
 	}
-	return -1;
+	else if (m_nLength <= len) {
+		lockObj.Lock();
+		memcpy(inbuf, m_sInBuf, m_nLength);
+		memset(m_sInBuf, 0, MAXBUF * 2);
+		int tmp = m_nLength;
+		m_nLength = 0;
+		lockObj.Unlock();
+		return tmp;
+	}
+	else {
+		lockObj.Lock();
+		memcpy(inbuf, m_sInBuf, len);
+		memmove(m_sInBuf, m_sInBuf + len, MAXBUF * 2 - len);
+		m_nLength -= len;
+		lockObj.Unlock();
+		return len;
+	}
 }
 
 void CPYH_Comm::Clear()
@@ -360,5 +345,5 @@ void CPYH_Comm::Clear()
 	PurgeComm(m_hComDev, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
 	memset(m_sInBuf, 0, MAXBUF * 2);
 	m_nLength = 0;
-
+	TRACE(_T("Buffer Clear \r\n"));
 }

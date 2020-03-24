@@ -5,7 +5,7 @@
 #include "SerialTest.h"
 #include "SettingsDlg.h"
 #include "afxdialogex.h"
-
+#include "CIni.h"
 
 // SettingsDlg 대화 상자입니다.
 
@@ -67,7 +67,7 @@ BOOL SettingsDlg::OnInitDialog()
 	m_comboBaudRate.AddString(_T("PCI_38400"));
 	m_comboBaudRate.AddString(_T("PCI_57600"));
 	m_comboBaudRate.AddString(_T("PCI_500k"));
-	m_comboBaudRate.SetCurSel(0);
+	m_comboBaudRate.SetCurSel(12);
 	m_comboParity.AddString(_T("None"));
 	m_comboParity.AddString(_T("Odd"));
 	m_comboParity.AddString(_T("Even"));
@@ -100,5 +100,16 @@ void SettingsDlg::OnBnClickedButtonSetting()
 	m_comboParity.SetCurSel(m_comboParity.GetCurSel());
 	m_comboDataBit.SetCurSel(m_comboDataBit.GetCurSel());
 	m_comboStopBit.SetCurSel(m_comboStopBit.GetCurSel());
+
+	CString sIniPath;
+	sIniPath.Format(_T("C:/test2/PortSave.ini"));
+	
+
+	WritePrivateProfileString(_T("PORT_SETTING"), _T("CommPort"), m_strCommPort, sIniPath);
+	WritePrivateProfileString(_T("PORT_SETTING"), _T("BaudRate"), m_strBaudRate, sIniPath);
+	WritePrivateProfileString(_T("PORT_SETTING"), _T("Parity"), m_strParity, sIniPath);
+	WritePrivateProfileString(_T("PORT_SETTING"), _T("DataBit"), m_strDataBit, sIniPath);
+	WritePrivateProfileString(_T("PORT_SETTING"), _T("StopBit"), m_strStopBit, sIniPath);
+
 	CDialog::OnOK();
 }

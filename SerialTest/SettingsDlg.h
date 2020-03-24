@@ -9,7 +9,7 @@ class SettingsDlg : public CDialogEx
 public:
 	SettingsDlg(CWnd* pParent = NULL);   // 표준 생성자입니다.
 	virtual ~SettingsDlg();
-// 대화 상자 데이터입니다.
+	// 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_SETTINGS_DIALOG };
 #endif

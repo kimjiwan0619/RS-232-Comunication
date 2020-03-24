@@ -16,6 +16,9 @@
 #define ASCII_XOFF	0x13
 #define	WM_MYRECEIVE	(WM_USER+1)
 #define	WM_MYCLOSE		(WM_USER+2)
+#define	WM_MYRECEIVECHK	(WM_USER+3)
+#define WM_MYSENDFILENAME (WM_USER+4)
+#define WM_FILERECEIVEOK (WM_USER+5)
 
 /////////////////////////////////////////////////////////////////////////////
 // CPYH_Comm command target
@@ -33,7 +36,6 @@ public:
 	HWND	m_hWnd;
 
 	BOOL	m_bIsOpenned;
-	CString m_sType;
 	CString	m_sComPort;
 	CString	m_sBaudRate;
 	CString	m_sParity;
@@ -55,8 +57,8 @@ public:
 	void HandleClose();
 	void Close();
 	void ResetSerial();
-	CPYH_Comm(CString port, CString baudrate, CString parity, CString type, CString databit, CString stopbit);
-	BOOL Check(LPCTSTR outbuf, int len);
+	CPYH_Comm(CString port, CString baudrate, CString parity, CString databit, CString stopbit, CWnd *pParent);
+	CWnd *m_pParent;
 	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CPYH_Comm)
